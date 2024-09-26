@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "BricolageGrotesque";
+  src: url("./assets/fonts/BricolageGrotesque-Regular.ttf");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "P22";
+  src: url("./assets/fonts/Fontspring-DEMO-P22Mackinac-Bold.otf");
+  font-weight: bold;
+  font-style: normal;
+}
+
+body {
+  background-color: hsl(var(--background));
+  height: 100svh;
+  font-family: "Grotesk", sans-serif !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button {
+  font-family: "P22", sans-serif !important;
+}
+
+p,
+input,
+textarea,
+select,
+label,
+div {
+  font-family: "BricolageGrotesque", sans-serif !important;
+}
+
+#root {
+  height: 100%;
+}
+@layer base {
+  :root {
+    --background: #f7f7f7;
+    --card: #ffffff;
+    --primary: #5b32e5;
+    --secondary: #ffc72f;
+    --secondary-alt: #fff2ca;
+    --muted: #f7f5f2;
+    --muted-alt: #808080;
+    --accent: #15f97c;
+    --accent-alt: #008e54;
+    --accent-2: #39aba3;
+    --destructive: #ff4c4c;
+    --radius: 8px;
+    --input-bg: #fafbfc;
+    --border: #e0e4ec;
+  }
+}
+
+.sigCanvas {
+  margin-inline: auto;
+  margin-top: 1rem;
+  border-bottom: 2px solid #d3d3d3;
+  width: 70%;
+  height: 70%;
+}
