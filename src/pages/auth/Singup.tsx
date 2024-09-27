@@ -239,7 +239,7 @@ function Signup() {
             <Typography variant="caption">
               Already signed up? &nbsp;{" "}
             </Typography>
-            <Link to="/auth/login">
+            <Link to="/login">
               <Typography variant="underlined" color="primary">
                 Login
               </Typography>

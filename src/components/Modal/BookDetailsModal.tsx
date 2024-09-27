@@ -265,7 +265,15 @@ const BooDetailsModal: FC<ModalComponentProps> = ({ modalId }) => {
                         author._id !== bookDetails.author._id &&
                           hideModal(MODAL_ID.BOOK_MODAL);
                         author._id !== bookDetails.author._id &&
-                          showModal(MODAL_ID.AUTHOR_MODAL);
+                          showModal(MODAL_ID.AUTHOR_MODAL, {
+                            _id: bookDetails.author._id,
+                            user: bookDetails.user,
+                            bio: bookDetails.author.bio,
+                            pen_name: bookDetails.author.pen_name,
+                            genres: bookDetails.author.genres,
+                            rating: bookDetails.rating,
+                            books: [],
+                          });
                       }}
                     >
                       {bookDetails.author.name}

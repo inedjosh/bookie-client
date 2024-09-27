@@ -3,7 +3,7 @@ import { Typography } from "../Typography";
 import BookCard from "../BookCard";
 import { Input } from "../Inputs/TextInput";
 import { Textarea } from "../Inputs/TextAreaInput";
-import { FaBookReader, FaStar } from "react-icons/fa";
+import { FaBookReader } from "react-icons/fa";
 import { GENRES, USER_ROLE } from "../../contants";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -53,7 +53,6 @@ function AuthorProfile() {
       try {
         setLoading(true);
         const { data } = await GetAuthor(user?.id);
-
         dispatch(
           setAuthor({
             _id: data._id,
@@ -171,20 +170,7 @@ function AuthorProfile() {
                   {author?.pen_name}{" "}
                 </Typography>
               </div>
-              <div className="flex items-center my-3">
-                {author.rating > 0 &&
-                  [...Array(author.rating)].map((_, index) => {
-                    const starNumber = index + 1;
-                    return (
-                      <span key={starNumber} className="flex">
-                        <FaStar className="text-secondary" />
-                      </span>
-                    );
-                  })}
-                <Typography as="p" variant="body" className="pl-3">
-                  {author.rating} Rating
-                </Typography>
-              </div>
+
               <div className="flex items-center my-4">
                 {" "}
                 <FaBookReader />
