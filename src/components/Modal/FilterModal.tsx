@@ -12,6 +12,18 @@ import { FaStar } from "react-icons/fa";
 import { SearchAuthors } from "../../services/author.service";
 import { SearchBooks } from "../../services/book.service";
 import { useRequestError } from "../Hooks/useRequestError";
+import { RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  LIBRARY_STATE,
+  setSearchActive,
+} from "../../redux/slices/uiActions.slice";
+import {
+  setAuthors,
+  setAuthorsPagination,
+  setBooks,
+  setBooksPagination,
+} from "../../redux/slices/library.slice";
 
 interface ModalComponentProps {
   modalId: string;
@@ -25,7 +37,6 @@ const FilterModal: FC<ModalComponentProps> = ({ modalId }) => {
 
   const [selectedGenre, setSelectedGenre] = useState<string>("");
   const [selectedRating, setSelectedRating] = useState<number>(0);
-
   const handleGenreSelect = (value: string) => {
     setSelectedGenre(value);
   };
@@ -34,28 +45,46 @@ const FilterModal: FC<ModalComponentProps> = ({ modalId }) => {
     setSelectedRating(value);
   };
 
+  const dispatch = useDispatch();
+  const { libraryState } = useSelector((state: RootState) => state.uiActions);
+
   const filter = async () => {
     try {
+      setLoading(true);
+      let result;
       if (selectedGenre || selectedRating) {
-        setLoading(true);
-        let result;
-        modalStates.filter.props?.state === "authors"
-          ? (result = await SearchAuthors({
-              genre: selectedGenre,
-            }))
-          : (result = await SearchBooks({
-              genre: selectedGenre,
-              rating: selectedRating,
-            }));
+        if (libraryState === LIBRARY_STATE.BOOKS) {
+          result = await SearchBooks({
+            genre: selectedGenre,
+            rating: selectedRating,
+          });
+          dispatch(
+            setBooksPagination({
+              currenPage: result.data.currentPage,
+              totalPages: result.data.totalPages,
+            })
+          );
 
-        console.log(result);
+          dispatch(setBooks(result.data.books));
+        } else {
+          result = await SearchAuthors({ genre: selectedGenre });
+
+          dispatch(setAuthors(result.data.authors));
+          dispatch(
+            setAuthorsPagination({
+              currenPage: result.data.currentPage,
+              totalPages: result.data.totalPages,
+            })
+          );
+        }
+        dispatch(setSearchActive(true));
       }
+      hideModal(MODAL_ID.FILTER);
     } catch (error) {
       handleRequestError(error);
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
-    console.log(selectedGenre, selectedRating);
   };
 
   if (!isOpen) return null;
@@ -104,7 +133,7 @@ const FilterModal: FC<ModalComponentProps> = ({ modalId }) => {
                   ))}
                 </div>
                 {modalStates.filter.props?.state !== "authors" && (
-                  <div className="ml-14">
+                  <div className="ml-5 md:ml-14">
                     <Typography as="h4" variant="body" className="my-4">
                       Rating
                     </Typography>
@@ -135,7 +164,7 @@ const FilterModal: FC<ModalComponentProps> = ({ modalId }) => {
                   </div>
                 )}{" "}
               </div>
-              <div className="w-[100px]">
+              <div className="w-[100px] mt-5">
                 {" "}
                 <Button loading={loading} disabled={loading} onClick={filter}>
                   Apply

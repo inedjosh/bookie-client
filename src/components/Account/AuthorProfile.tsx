@@ -131,10 +131,10 @@ function AuthorProfile() {
       } else {
         payload = {
           ...values,
+          genres: author.genres,
         };
       }
-      const updatedAuthor = await UpdateAuthorProfile(payload, author._id);
-      console.log(updatedAuthor);
+      await UpdateAuthorProfile(payload);
       toast.success("Authors profile updated successfully");
     } catch (error) {
       handleRequestError(error);
@@ -143,7 +143,7 @@ function AuthorProfile() {
 
   if (loading)
     return (
-      <div className="w-full h- flex justify-center items-center">
+      <div className="w-full h-[300px] flex justify-center items-center">
         <ClipLoader color="#5b32e5" size="20px" />
       </div>
     );

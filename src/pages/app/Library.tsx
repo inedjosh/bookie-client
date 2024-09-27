@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Typography } from "../../components/Typography";
-import { AuthorImage, BookImage } from "../../assets";
 import BookCard from "../../components/BookCard";
 import AuthorCard from "../../components/AuthorCard";
 import { IoFilterSharp } from "react-icons/io5";
@@ -19,9 +18,14 @@ import {
   setBooksPagination,
 } from "../../redux/slices/library.slice";
 import { RootState } from "../../redux/store";
+import {
+  LIBRARY_STATE,
+  setLibraryState,
+  setSearchActive,
+} from "../../redux/slices/uiActions.slice";
 
 function Library() {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(LIBRARY_STATE.BOOKS);
   const { showModal } = useModal();
   const dispatch = useDispatch();
   const { handleRequestError } = useRequestError({ useToast: true });
@@ -31,7 +35,9 @@ function Library() {
     (state: RootState) => state.library
   );
 
-  console.log(bookPagination, authorsPagination);
+  const [clearFilter, setClearFilter] = useState(false);
+
+  const { searchActive } = useSelector((state: RootState) => state.uiActions);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,17 +61,17 @@ function Library() {
           })
         );
         dispatch(setBooks(data[1].data.books));
+        dispatch(setSearchActive(false));
       } catch (error) {
         handleRequestError(error);
       } finally {
         setLoading(false);
+        setClearFilter(false);
       }
     };
 
     fetchData();
-  }, [authorsPagination.currenPage, bookPagination.currenPage]);
-
-  console.log(books, authors);
+  }, [authorsPagination.currenPage, bookPagination.currenPage, clearFilter]);
 
   if (loading)
     return (
@@ -77,48 +83,72 @@ function Library() {
   return (
     <div className="h-screen ">
       <div className="flex flex-col justify-between  h-[90%]">
-        <div className="">
-          <div className="flex justify-between mt-14 lg:mt-5">
+        <div className="pb-40">
+          <div className="flex justify-between mt-14 items-center lg:mt-5">
             <div className="flex justify-start px-0 mt-5 ">
               <Typography
                 variant="body"
-                color={`${active === 0 ? "primary" : "muted-alt"}`}
-                onClick={() => setActive(0)}
-                className={`${active === 0 ? "underline" : ""} cursor-pointer`}
+                color={`${
+                  active === LIBRARY_STATE.BOOKS ? "primary" : "muted-alt"
+                }`}
+                onClick={() => {
+                  setActive(LIBRARY_STATE.BOOKS);
+                  dispatch(setLibraryState(LIBRARY_STATE.BOOKS));
+                }}
+                className={`${
+                  active === LIBRARY_STATE.BOOKS ? "underline" : ""
+                } cursor-pointer`}
               >
                 Books
               </Typography>
               <Typography
                 variant="body"
-                color={`${active === 1 ? "primary" : "muted-alt"}`}
-                onClick={() => setActive(1)}
+                color={`${
+                  active === LIBRARY_STATE.AUTHORS ? "primary" : "muted-alt"
+                }`}
+                onClick={() => {
+                  setActive(LIBRARY_STATE.AUTHORS);
+                  dispatch(setLibraryState(LIBRARY_STATE.AUTHORS));
+                }}
                 className={`${
-                  active === 1 ? "underline" : ""
+                  active === LIBRARY_STATE.AUTHORS ? "underline" : ""
                 } pl-10  cursor-pointer`}
               >
                 Authors
               </Typography>
             </div>
-            <div
-              className="border-input border p-2 bg-white "
-              onClick={() =>
-                showModal(MODAL_ID.FILTER, {
-                  state: active === 0 ? "books" : "authors",
-                })
-              }
-            >
-              <IoFilterSharp size="30px" />
-            </div>{" "}
+            {searchActive ? (
+              <div
+                className="border-input border p-2 bg-white "
+                onClick={() => setClearFilter(true)}
+              >
+                <Typography>Clear filter</Typography>
+              </div>
+            ) : (
+              <div
+                className="border-input border p-2 bg-white "
+                onClick={() =>
+                  showModal(MODAL_ID.FILTER, {
+                    state:
+                      active === LIBRARY_STATE.BOOKS
+                        ? LIBRARY_STATE.BOOKS
+                        : LIBRARY_STATE.AUTHORS,
+                  })
+                }
+              >
+                <IoFilterSharp size="30px" />
+              </div>
+            )}
           </div>
 
           <div className="mt-10">
-            {active === 0 ? (
+            {active === LIBRARY_STATE.BOOKS ? (
               <div className="flex flex-col md:flex-row flex-wrap mt-10">
                 {books.map((book) => (
                   <BookCard
                     key={book._id}
                     id={book._id}
-                    book_image_url={BookImage}
+                    book_image_url={book.book_image_url}
                     title={book.title}
                     description={book.description}
                     rating={book.rating}
@@ -135,7 +165,7 @@ function Library() {
                     <AuthorCard
                       key={author._id}
                       id={author._id}
-                      img={AuthorImage}
+                      img={author.user.profile_url}
                       name={`${author.user.first_name} ${author.user.last_name}}`}
                       genres={author.genres}
                       rating={author.rating}
@@ -148,7 +178,7 @@ function Library() {
             )}
           </div>
         </div>
-        {active === 0 ? (
+        {active === LIBRARY_STATE.BOOKS ? (
           <Pagination
             currentPage={bookPagination.currenPage}
             totalPages={bookPagination.totalPages}

@@ -44,8 +44,8 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="flex justify-end fixed  w-full h-[80px] bottom-0 right-0">
-      <div className=" flex w-[200px] justify-between mr-20">
+    <div className="flex justify-end fixed  w-full h-[80px] bottom-14 bg-background py-2 md:bottom-0 right-0">
+      <div className=" flex w-[200px] justify-between mr-4 md:mr-20">
         <div className="w-[40px]  h-[40px]">
           <button
             className="border w-full flex justify-center items-center h-full  p-3 border-primary"

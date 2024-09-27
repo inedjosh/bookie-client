@@ -62,11 +62,9 @@ const EditBookModal: FC<ModalComponentProps> = ({ modalId }) => {
 
     try {
       const url = await uploadFileToFirebase(file, "images");
-      console.log(url);
 
       setImageUrl(url);
     } catch (error) {
-      console.error("Upload failed:", error);
     } finally {
       setLoadingImage(false);
     }
@@ -81,7 +79,6 @@ const EditBookModal: FC<ModalComponentProps> = ({ modalId }) => {
 
       setDocumentName(generateRandomDocumentName());
     } catch (error) {
-      console.error("Upload failed:", error);
     } finally {
       setLoadingDoc(false);
     }

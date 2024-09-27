@@ -5,7 +5,6 @@ import { Typography } from "../Typography";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MODAL_ID } from "../../Layouts/ModalLayouts";
 import { FaBookReader } from "react-icons/fa";
-import { AuthorImage } from "../../assets";
 import BookCard from "../BookCard";
 import { Author } from "../../redux/slices/author.slice";
 
@@ -39,7 +38,6 @@ const AuthorDetailsModal: FC<ModalComponentProps> = ({ modalId }) => {
   });
 
   useEffect(() => {
-    console.log(modalStates.author_modal.props);
     if (modalStates.author_modal.props)
       setAuthor({
         _id: modalStates.author_modal.props._id,
@@ -89,7 +87,10 @@ const AuthorDetailsModal: FC<ModalComponentProps> = ({ modalId }) => {
             </div>
             <div className="p-5 ">
               <div className="flex  items-center flex-row">
-                <img src={AuthorImage} className="w-[200px] h-[200px] " />
+                <img
+                  src={author.user.profile_url}
+                  className="w-[150px] h-[150px] "
+                />
                 <div className="md:pl-5 mt-10 md:mt-0">
                   <Typography as="h4" variant="subheading">
                     {`${author.user.first_name} ${author.user.last_name}`}

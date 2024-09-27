@@ -23,3 +23,10 @@ export const RegisterRequest = async (payload: {
 
   return res.data;
 };
+
+export const Logout = async () => {
+  const url = `${authEndpoint}logout`;
+  const res = await axiosInstance.delete(url);
+  window.location.href = "/login";
+  return res.data;
+};

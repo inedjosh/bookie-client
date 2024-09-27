@@ -73,7 +73,7 @@ const BecomeAnAuthorModal: FC<ModalComponentProps> = ({ modalId }) => {
 
   const submit = async (values: FormProps) => {
     try {
-      const author = await BecomenAnAuthor({
+      await BecomenAnAuthor({
         ...values,
         genres: selectedGenres,
       });
@@ -81,7 +81,6 @@ const BecomeAnAuthorModal: FC<ModalComponentProps> = ({ modalId }) => {
 
       dispatch(signinUser(user.data));
 
-      console.log(author);
       toast.success("You are now an author");
     } catch (error) {
       handleRequestError(error);

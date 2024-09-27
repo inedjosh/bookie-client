@@ -70,6 +70,37 @@ export const RateBook = async (payload: {
   return res.data;
 };
 
+export const DeleteBook = async (bookId: string) => {
+  const url = `${bookEndpoint}/${bookId}`;
+  const res = await axiosInstance.delete(url);
+
+  return res.data;
+};
+
+const buildSearchUrl = (
+  baseEndpoint: string,
+  query?: string,
+  genre?: string,
+  rating?: number
+) => {
+  const params = new URLSearchParams();
+
+  if (query) {
+    params.append("query", query);
+  }
+
+  if (genre) {
+    params.append("genre", genre);
+  }
+
+  if (rating !== undefined) {
+    params.append("rating", rating.toString());
+  }
+
+  const url = `${baseEndpoint}/search/books?${params.toString()}`;
+  return url;
+};
+
 export const SearchBooks = async ({
   query,
   genre,
@@ -79,7 +110,7 @@ export const SearchBooks = async ({
   genre?: string;
   rating?: number;
 }) => {
-  const url = `${bookEndpoint}/search?query=${query}&genre=${genre}&rating=${rating}`;
+  const url = buildSearchUrl(bookEndpoint, query, genre, rating);
 
   const res = await axiosInstance.get(url);
 

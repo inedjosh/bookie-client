@@ -8,6 +8,7 @@ import { signinUser } from "../../redux/slices/auth.slice";
 import { useRequestError } from "../Hooks/useRequestError";
 import { Button } from "../Buttons";
 import { Input } from "../Inputs/TextInput";
+import { Logout } from "../../services/auth.service";
 // import { Upload } from "../Inputs/UploadInput";
 
 type FormProps = {
@@ -31,7 +32,7 @@ function PersonalProfile() {
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const { handleRequestError } = useRequestError({ useToast: true });
-
+  const [loading, setLoading] = useState(false);
   const {
     values,
     handleChange,
@@ -76,12 +77,21 @@ function PersonalProfile() {
 
   const submit = async (values: FormProps) => {
     try {
-      console.log(values);
       const updatedUser = await UpdateProfile(values);
-      console.log(updatedUser);
       dispatch(signinUser(updatedUser.data));
     } catch (error) {
       handleRequestError(error);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      setLoading(true);
+      await Logout();
+    } catch (error) {
+      handleRequestError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,13 +103,7 @@ function PersonalProfile() {
             src={user?.profile_url}
             className=" object-contain w-24 h-24 rounded-full"
           />
-          <div className="flex ml-3  justify-end">
-            {/* <Upload
-              setCropActive={function (cropActive: boolean): void {
-                throw new Error("Function not implemented.");
-              }}
-            /> */}
-          </div>
+          <div className="flex ml-3  justify-end"></div>
         </div>
         <form onSubmit={handleSubmit}>
           <div className=" mt-10">
@@ -159,14 +163,26 @@ function PersonalProfile() {
               label="Email"
             />
           </div>
-          <div className="mt-10 w-[150px]">
-            <Button
-              type="submit"
-              loading={isSubmitting}
-              disabled={!editedForm || isSubmitting}
-            >
-              Update
-            </Button>
+          <div className="flex items-center">
+            <div className="mt-10 w-[150px]  ">
+              <Button
+                type="submit"
+                loading={isSubmitting}
+                disabled={!editedForm || isSubmitting}
+              >
+                Update
+              </Button>
+            </div>
+            <div className="mt-10 w-[150px]  pl-10">
+              <Button
+                loading={loading}
+                disabled={loading}
+                onClick={logout}
+                variant="destructive"
+              >
+                Logout
+              </Button>
+            </div>
           </div>
         </form>
       </div>

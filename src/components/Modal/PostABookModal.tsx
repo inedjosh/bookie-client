@@ -61,10 +61,8 @@ const PostABookModal: FC<ModalComponentProps> = ({ modalId }) => {
 
     try {
       const url = await uploadFileToFirebase(file, "images");
-      console.log(url);
       setImageUrl(url);
     } catch (error) {
-      console.error("Upload failed:", error);
     } finally {
       setLoadingImage(false);
     }
@@ -78,7 +76,6 @@ const PostABookModal: FC<ModalComponentProps> = ({ modalId }) => {
       setDocumentUrl(url);
       setDocumentName(generateRandomDocumentName());
     } catch (error) {
-      console.error("Upload failed:", error);
     } finally {
       setLoadingDoc(false);
     }
@@ -124,7 +121,7 @@ const PostABookModal: FC<ModalComponentProps> = ({ modalId }) => {
         book_url: documentUrl as string,
         book_image_url: imageUrl,
       };
-      const book = await UploadBook(payload);
+      await UploadBook(payload);
 
       const { data } = await GetAuthor(user?.id);
 
@@ -147,7 +144,6 @@ const PostABookModal: FC<ModalComponentProps> = ({ modalId }) => {
           books: data?.books,
         })
       );
-      console.log(book);
       toast.success("Book uploaded successfully");
       setValues({
         title: "",

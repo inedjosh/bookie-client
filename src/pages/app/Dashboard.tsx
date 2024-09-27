@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { BookImage, HeroImage } from "../../assets";
+import { HeroImage } from "../../assets";
 import { Button } from "../../components/Buttons";
 import { Typography } from "../../components/Typography";
 import AuthorCard from "../../components/AuthorCard";
@@ -132,7 +132,7 @@ function Dashboard() {
                   <BookCard
                     key={book._id}
                     id={book._id}
-                    book_image_url={BookImage}
+                    book_image_url={book.book_image_url}
                     title={book.title}
                     description={book.description}
                     rating={book.rating}

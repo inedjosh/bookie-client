@@ -7,14 +7,78 @@ import { useModal } from "../../components/Modal/ModalProvider";
 import { MODAL_ID } from "../ModalLayouts";
 import SearchInput from "../../components/Inputs/SearchInput";
 import { RootState } from "../../redux/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { USER_ROLE } from "../../contants";
+import { useState, FormEvent } from "react";
+import { useRequestError } from "../../components/Hooks/useRequestError";
+import {
+  LIBRARY_STATE,
+  setSearchActive,
+} from "../../redux/slices/uiActions.slice";
+import { SearchBooks } from "../../services/book.service";
+import { SearchAuthors } from "../../services/author.service";
+import {
+  setAuthors,
+  setAuthorsPagination,
+  setBooks,
+  setBooksPagination,
+} from "../../redux/slices/library.slice";
 
 const DashboardLayout = () => {
   const currentRoute = useCurrentPath();
   const { user } = useSelector((state: RootState) => state.auth);
-
+  const { handleRequestError } = useRequestError({ useToast: true });
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const { libraryState } = useSelector((state: RootState) => state.uiActions);
+
+  const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      let result;
+      setLoading(true);
+      if (libraryState === LIBRARY_STATE.BOOKS) {
+        result = await SearchBooks({ query: searchQuery });
+        dispatch(
+          setBooksPagination({
+            currenPage: result.data.currentPage,
+            totalPages: result.data.totalPages,
+          })
+        );
+
+        dispatch(setBooks(result.data.books));
+      } else {
+        result = await SearchAuthors({ query: searchQuery });
+
+        dispatch(setAuthors(result.data.authors));
+        dispatch(
+          setAuthorsPagination({
+            currenPage: result.data.currentPage,
+            totalPages: result.data.totalPages,
+          })
+        );
+      }
+      dispatch(setSearchActive(true));
+    } catch (error) {
+      handleRequestError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleIconClick = async () => {
+    if (searchQuery.trim()) {
+      const e = new Event("click");
+      await handleSearch(e as any);
+    }
+  };
 
   const footerLinks: {
     id: number;
@@ -35,7 +99,7 @@ const DashboardLayout = () => {
       icon: RiBook3Line,
       text: "Library",
       link: "/app/library",
-      route: "Library",
+      route: "library",
     },
     {
       id: 3,
@@ -47,7 +111,7 @@ const DashboardLayout = () => {
   ];
 
   return (
-    <div className="font-latoRegular bg-background w-screen min-h-screen relative">
+    <div className="font-latoRegular bg-white w-screen min-h-screen relative">
       <div>
         <header className="bg-white lg:px-20 px-4  py-4 fixed flex lg:items-center flex-col lg:justify-between lg:flex-row w-full z-10 top-0 ">
           <div className="flex-[.3] flex justify-between items-center ">
@@ -72,7 +136,7 @@ const DashboardLayout = () => {
                 <Button onClick={() => showModal(MODAL_ID.ADD_BOOK)} size="sm">
                   <Typography as="h4" variant="body">
                     {" "}
-                    Post a book{" "}
+                    Post a book
                   </Typography>{" "}
                 </Button>
               )}{" "}
@@ -81,9 +145,15 @@ const DashboardLayout = () => {
           <div className="flex-[.5]  lg:mt-0  mt-3">
             {currentRoute.isAppRoute &&
               currentRoute.currentPath === "library" && (
-                <div className="w-full lg:w-[60%]">
-                  <SearchInput placeholder="Search..." />
-                </div>
+                <form onSubmit={handleSearch} className="w-full lg:w-[60%]">
+                  <SearchInput
+                    onIconClick={handleIconClick}
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    placeholder="Search..."
+                    loading={loading}
+                  />
+                </form>
               )}
           </div>
           <div className="hidden lg:flex flex-[.5] ">
@@ -127,7 +197,7 @@ const DashboardLayout = () => {
               : "pt-[95px]"
           }  lg:pt-[80px] md:pt-[75px] `}
         >
-          <div className="lg:px-20 px-4  md:py-2 mb-40 lg:mb-20 ">
+          <div className="lg:px-20 px-4  md:py-2 mb-40 bg-white lg:mb-20 ">
             <Outlet />
           </div>
           <div className="lg:hidden  flex bg-white  p-5 justify-between fixed w-full bottom-0">

@@ -19,7 +19,10 @@ function AuthorCard({ id, img, name, bio, author }: Props) {
   return (
     <div key={id} className="flex items-center justify-start  md:w-[310px] ">
       <div className="flex-[.5]">
-        <img src={img} className="w-[150px] object-contain rounded-full" />
+        <img
+          src={img}
+          className="w-[120px] md:w-[120px] object-contain rounded-full"
+        />
       </div>
       <div className="pl-2  flex flex-col  flex-[.5] ">
         <Typography as="h5" variant="subheading2">

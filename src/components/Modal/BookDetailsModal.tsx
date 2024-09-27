@@ -86,6 +86,7 @@ const BooDetailsModal: FC<ModalComponentProps> = ({ modalId }) => {
   const { modalStates, hideModal, showModal } = useModal();
   const isOpen = modalStates[modalId]?.isOpen;
   const [loading, setLoading] = useState(false);
+  const [fetchBookAgain, setFecthBookAgain] = useState(false);
   const [bookDetails, setBookDetails] = useState<BookDetails>({
     _id: "",
     title: "",
@@ -124,19 +125,18 @@ const BooDetailsModal: FC<ModalComponentProps> = ({ modalId }) => {
     const getABook = async () => {
       try {
         setLoading(true);
-        console.log(modalStates?.book_modal?.props?.id);
         const book = await GetABook(modalStates?.book_modal?.props?.id);
-        console.log(book);
         setBookDetails(book.data);
       } catch (error) {
         handleRequestError(error);
       } finally {
         setLoading(false);
+        setFecthBookAgain(false);
       }
     };
 
     if (modalStates?.book_modal?.props?.id) getABook();
-  }, [modalStates?.book_modal?.props?.id]);
+  }, [modalStates?.book_modal?.props?.id, fetchBookAgain]);
 
   const [rating, setRating] = useState(0);
 
@@ -171,7 +171,7 @@ const BooDetailsModal: FC<ModalComponentProps> = ({ modalId }) => {
         };
 
         await RateBook(payload);
-
+        setFecthBookAgain(true);
         toast.success("Rating added successfully");
       }
     } catch (error) {
@@ -357,7 +357,7 @@ const BooDetailsModal: FC<ModalComponentProps> = ({ modalId }) => {
                   </div>
                 )}
               </div>
-              {author._id !== bookDetails.author._id &&
+              {user.id !== bookDetails.user._id &&
                 !hasUserCommented(bookDetails.reviews, user.id) && (
                   <form onSubmit={handleSubmit}>
                     <hr className="my-10" />
