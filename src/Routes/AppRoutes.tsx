@@ -32,10 +32,14 @@ export const DashboardRoutes = {
   ],
 };
 
-export const AutheticationRoutes = {
+export const AuthenticationRoutes = {
   path: "/",
   element: <AuthLayout />,
   children: [
+    {
+      path: "/",
+      element: <Navigate to="login" replace />,
+    },
     {
       path: "register",
       element: <Signup />,
@@ -43,10 +47,6 @@ export const AutheticationRoutes = {
     {
       path: "login",
       element: <Login />,
-    },
-    {
-      path: "*",
-      element: <Navigate to="/login" replace />,
     },
   ],
 };
