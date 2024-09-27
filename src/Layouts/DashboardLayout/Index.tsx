@@ -66,6 +66,7 @@ const DashboardLayout = () => {
         );
       }
       dispatch(setSearchActive(true));
+      setSearchQuery("");
     } catch (error) {
       handleRequestError(error);
     } finally {
