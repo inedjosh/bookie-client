@@ -25,7 +25,7 @@ function ArticlePage() {
       try {
         setLoading(true);
         const response = await fetchData<ContentType>(`course-content/${id}`);
-        console.log(response.data);
+
         setContent(response.data);
       } finally {
         setLoading(false);
