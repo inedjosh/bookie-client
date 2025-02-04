@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export function useRequestError({ useToast = false } = {}) {
+export function useRequestError({ useToast = true } = {}) {
   const [error, setError] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -2,10 +2,14 @@ import { ComponentType, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { RootState } from "../redux/store";
-import { signinUser } from "../redux/slices/auth.slice";
 import { useRequestError } from "./Hooks/useRequestError";
-import { GetUser } from "../services/user.service";
-import { Typography } from "./Typography";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+import { AxiosSingleUserType, CohortType, UserType } from "../types";
+import { fetchData } from "../Utils/fetch";
+import { setCohort, signinUser } from "../redux/slices/auth.slice";
+import { Logo } from "../assets";
 
 interface AuthHocProps<P> {
   component: ComponentType<P>;
@@ -16,6 +20,8 @@ const AuthHoc = <P,>({ component: Component, ...rest }: AuthHocProps<P>) => {
   const { token } = useSelector((state: RootState) => state.auth);
   const { handleRequestError } = useRequestError({ useToast: true });
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   const refreshUser = async () => {
     try {
       setLoading(true);
@@ -27,9 +33,10 @@ const AuthHoc = <P,>({ component: Component, ...rest }: AuthHocProps<P>) => {
         return;
       }
 
-      const user = await GetUser();
+      const data = await fetchData<AxiosSingleUserType>("/user");
 
-      dispatch(signinUser(user.data));
+      dispatch(signinUser(data.data?.user as UserType));
+      dispatch(setCohort(data.data?.cohort as CohortType));
     } catch (error) {
       handleRequestError(error);
     } finally {
@@ -37,16 +44,47 @@ const AuthHoc = <P,>({ component: Component, ...rest }: AuthHocProps<P>) => {
     }
   };
 
+  const setupAxiosInterceptors = () => {
+    axios.interceptors.request.use(async (config) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const decodedToken: any = jwtDecode(token.accessToken);
+      const currentTime = Date.now() / 1000;
+      const tokenExpiryTime = decodedToken.exp;
+
+      if (tokenExpiryTime - currentTime < 300) {
+        await refreshUser();
+        config.headers.Authorization = `Bearer ${Cookies.get("atk")}`;
+      }
+
+      return config;
+    });
+  };
+
+  const isPageReload = (): boolean => {
+    const navEntries = performance.getEntriesByType("navigation");
+    if (navEntries.length > 0) {
+      return (navEntries[0] as PerformanceNavigationTiming).type === "reload";
+    }
+    return performance.navigation.type === 1; // Deprecated but fallback
+  };
+
   useEffect(() => {
-    refreshUser();
-  }, []);
+    if (!isPageReload()) {
+      return;
+    }
+
+    if (!token.accessToken || !token.refreshToken) {
+      navigate("/login");
+    } else {
+      setupAxiosInterceptors();
+      refreshUser();
+    }
+  }, [token]);
 
   if (loading)
     return (
       <div className="w-full h-screen flex justify-center items-center">
-        <Typography variant="heading" color="primary" as="h1">
-          Bookie
-        </Typography>{" "}
+        <img src={Logo} />
       </div>
     );
 

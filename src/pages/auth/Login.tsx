@@ -7,10 +7,15 @@ import { useRequestError } from "../../components/Hooks/useRequestError";
 import { Input } from "../../components/Inputs/TextInput";
 import { PasswordInput } from "../../components/Inputs/PasswordInput";
 import { Button } from "../../components/Buttons";
-import Card from "../../components/Card";
 import { Typography } from "../../components/Typography";
 import { LoginRequest } from "../../services/auth.service";
-import { setTokens, signinUser } from "../../redux/slices/auth.slice";
+import {
+  setCohort,
+  setTokens,
+  signinUser,
+} from "../../redux/slices/auth.slice";
+import { ACCOUNT_TYPES } from "../../constants";
+import { CustomCheckbox } from "../../components/Inputs/CheckboxInput/CheckboxInput";
 
 type loginFormProps = {
   email: string;
@@ -50,6 +55,8 @@ function Login() {
   const submit = async (values: loginFormProps) => {
     try {
       const user = await LoginRequest(values);
+      console.log(user);
+      console.log(user.data);
       dispatch(
         setTokens({
           accessToken: user.data.accessToken,
@@ -57,28 +64,41 @@ function Login() {
         })
       );
       dispatch(signinUser(user.data.user));
+      if (
+        user.data.user.role === ACCOUNT_TYPES.STUDENT ||
+        user.data.user.role === ACCOUNT_TYPES.TEACHER
+      ) {
+        dispatch(setCohort(user.data.cohort));
+      }
       Cookies.set("atk", user.data.accessToken);
       Cookies.set("rtk", user.data.refreshToken);
-      navigate("/app/overview");
+
+      if (user.data.user.role === ACCOUNT_TYPES.ADMIN) {
+        navigate("/admin/overview");
+      } else if (user.data.user.role === ACCOUNT_TYPES.TEACHER) {
+        navigate("/teacher/overview");
+      } else if (user.data.user.role === ACCOUNT_TYPES.STUDENT) {
+        navigate("/student/overview");
+      }
     } catch (err) {
       handleRequestError(err);
     }
   };
 
   return (
-    <Card>
-      <div className=" flex justify-center w-full">
+    <>
+      <div className="md:px-14 px-5 flex justify-center w-full">
         <form
           onSubmit={handleSubmit}
-          className="w-full flex flex-col justify-center items-center"
+          className="w-full flex flex-col justify-center "
         >
           <div className="flex-col justify-center w-[95%]  items-center">
-            <h3 className="text-primary-blue text-2xl font-medium text-center">
-              Welcome Back
-            </h3>
-            <p className="text-center font-medium text-sm md:text-sm">
-              Login to your account to continue reading!
-            </p>
+            <Typography variant="heading" className=" md:text-center">
+              Unlock a World of Learning,
+            </Typography>
+            <Typography variant="heading" className="md:text-center">
+              One Toggle at a Time.{" "}
+            </Typography>
           </div>
 
           <div className="w-full my-5">
@@ -106,28 +126,47 @@ function Login() {
               label="Password"
             />
           </div>
-          <div className="w-full mt-10">
+          <div className="my-5 flex items-center ">
+            <CustomCheckbox
+              onChange={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+              value={undefined}
+              label={undefined}
+            />
+            <div className="flex flex-col justify-start items-start">
+              <Typography className=" pl-3">Keep me logged in</Typography>
+
+              <Typography className=" pl-3" color="muted-alt" variant="caption">
+                Stay logged in for quicker access to your learning hub.{" "}
+              </Typography>
+            </div>
+          </div>
+
+          <div className="w-full mt-8">
             <Button
-              color="primary-blue"
               disabled={isSubmitting}
               loading={isSubmitting}
               type="submit"
+              className=" h-[55px]"
             >
-              Login
+              Toggle In 🚀
             </Button>
+            <Typography className="text-center mt-5">
+              Together we can turn on the tech switch,
+              <strong> One Toggle at a Time</strong>
+            </Typography>
           </div>
-          <div className="flex justify-center  w-full  mt-5 ">
-            <div className="flex items-start">
-              <Typography variant="caption">New User? &nbsp; </Typography>{" "}
-              <Typography variant="underlined" color="primary">
-                <Link to="/register"> Sign up </Link>
-              </Typography>
-            </div>
+          <div className="flex items-center justify-center mt-5">
+            <Typography variant="caption">Forgot password? &nbsp; </Typography>{" "}
+            <Typography variant="underlined" color="primary">
+              <Link to="/forgot-password"> Reset Password </Link>
+            </Typography>
           </div>
         </form>
       </div>
       <div></div>
-    </Card>
+    </>
   );
 }
 

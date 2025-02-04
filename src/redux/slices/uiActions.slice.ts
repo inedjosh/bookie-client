@@ -1,34 +1,24 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export enum LIBRARY_STATE {
-  BOOKS = "books",
-  AUTHORS = "authors",
-}
-
 type UiActionState = {
-  libraryState: LIBRARY_STATE;
-  searchActive: boolean;
+  reload: boolean;
 };
 
 const initialState: UiActionState = {
-  libraryState: LIBRARY_STATE.BOOKS,
-  searchActive: false,
+  reload: false,
 };
 
 const uiActionSlice = createSlice({
   name: "uiActions",
   initialState,
   reducers: {
-    setLibraryState: (state, { payload }: PayloadAction<LIBRARY_STATE>) => {
-      state.libraryState = payload;
-    },
-    setSearchActive: (state, { payload }: PayloadAction<boolean>) => {
-      state.searchActive = payload;
+    setReload: (state, { payload }: PayloadAction<boolean>) => {
+      state.reload = payload;
     },
   },
 });
 
 const { actions, reducer: UiActionReducer } = uiActionSlice;
 
-export const { setLibraryState, setSearchActive } = actions;
+export const { setReload } = actions;
 export default UiActionReducer;

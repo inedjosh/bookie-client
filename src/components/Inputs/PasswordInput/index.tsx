@@ -3,12 +3,12 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const inputVariants = cva(
-  "flex h-[58px] w-full border bg-inputBg px-3 py-2 text-sm ring-offset-inputBg file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+  "flex h-[58px] w-full bg-inputBg border rounded-[5px] border-input px-3 py-2 text-sm file:border-0 file:bg-inputBg file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
         default: "border-input",
-        focused: "border-primary",
+        focused: "border-border",
         error: "border-destructive focus-visible:ring-border-destructive",
       },
     },
@@ -39,10 +39,7 @@ interface PasswordInputProps
 }
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
-  (
-    { className, label, error, onFocus, handleBlur, touched, ...props },
-    ref
-  ) => {
+  ({ className, label, error, touched, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const [focus, setFocus] = useState(false);
 
@@ -52,7 +49,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
     };
 
     return (
-      <div className="space-y-2">
+      <div className="relative">
         {label && (
           <label
             className="mb-2 block text-sm font-medium text-[#1f1f1f]"

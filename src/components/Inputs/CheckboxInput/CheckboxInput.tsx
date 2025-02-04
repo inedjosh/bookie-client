@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 const checkboxVariants = cva();
 
 interface CustomCheckboxProps extends VariantProps<typeof checkboxVariants> {
-  onChange: (option: any) => void;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value: string | number | readonly string[] | undefined;
   label: React.ReactNode;
   isChecked?: boolean;

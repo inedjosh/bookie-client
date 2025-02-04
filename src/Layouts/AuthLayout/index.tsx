@@ -1,13 +1,14 @@
 import { Outlet } from "react-router-dom";
+import { AuthImg } from "../../assets";
 
 const AuthLayout = () => {
   return (
-    <div className=" bg-[#030142] overflow-x-hidden w-screen h-screen relative">
-      <div className="flex h-full justify-center items-center">
-        <div className="absolute inset-0 ">
-          <h1 className="text-white text-3xl text-center py-5">Bookie</h1>
+    <div className=" p-5 w-screen h-screen relative">
+      <div className="flex h-full justify-between items-center">
+        <div className="md:w-[40%] hidden md:block h-full inset-0 ">
+          <img src={AuthImg} className="w-full h-full object-fit" />
         </div>
-        <div className="w-[95%] md:w-[45%] lg:w-[35%] 2xl:w-[30%] flex justify-center items-center flex-col z-10  ">
+        <div className="w-full md:w-[50%] flex justify-center items-center flex-col  ">
           <div className=" w-full h-full py-5">
             <Outlet />
           </div>

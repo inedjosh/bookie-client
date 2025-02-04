@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { FaSearch } from "react-icons/fa"; // Importing the search icon
 
 const inputVariants = cva(
-  "flex h-[58px] w-full bg-inputBg border border-input px-3 py-2 text-sm file:border-0 file:bg-inputBg file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+  "flex h-[58px] w-full bg-inputBg border rounded-[5px] border-input px-3 py-2 text-sm file:border-0 file:bg-inputBg file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {

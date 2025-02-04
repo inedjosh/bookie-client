@@ -2,7 +2,7 @@ import React, { ChangeEvent, FocusEvent } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const textareaVariants = cva(
-  "flex min-h-[120px] w-full  border border-input bg-inputBg px-3 py-2 text-sm ring-offset-inputBg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
+  "flex min-h-[120px] w-full  border rounded-[5px] border-input bg-inputBg px-3 py-2 text-sm ring-offset-inputBg placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {

@@ -1,13 +1,14 @@
-import { MouseEventHandler, useState } from "react";
+import { ChangeEventHandler, MouseEventHandler } from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 
 type PlainInputType = {
   value?: string | number;
-  onChange?: any;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
   name?: string;
   placeholder?: string;
   onIconClick: MouseEventHandler<HTMLButtonElement>;
   loading: boolean;
+  className?: string;
 };
 const SearchInput = ({
   value,
@@ -16,22 +17,18 @@ const SearchInput = ({
   placeholder = "",
   onIconClick,
   loading,
+  className,
 }: PlainInputType) => {
-  const [focus, setFocus] = useState(false);
   return (
     <div
-      className={`${
-        focus ? "border-primary" : "border-[#EAF0F5]"
-      } border-[1.38px] bg-[#FAFAFA] h-[50px]  w-full px-3  font-normal flex items-center space-x-3`}
+      className={` border-[1.38px] bg-white h-[50px] rounded-[5px] w-full px-3  font-normal flex items-center space-x-3 ${className}`}
     >
       <input
         value={value}
         onChange={onChange}
         placeholder={placeholder}
         name={name}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setFocus(false)}
-        className={`outline-none borde-none bg-none placeholder:text-[#9199A3] w-full h-full bg-[#FAFAFA]`}
+        className={`outline-none border-none bg-none placeholder:text-[#9199A3] w-full h-full`}
       />
       {loading ? (
         <ClipLoader color="#5b32e5" size="15px" />

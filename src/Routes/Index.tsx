@@ -1,6 +1,17 @@
 import { useRoutes } from "react-router-dom";
-import { AuthenticationRoutes, DashboardRoutes } from "./AppRoutes";
+import {
+  AuthenticationRoutes,
+  StudentDashboardRoutes,
+  TeacherDashboardRoutes,
+  AdminDashboardRoutes,
+} from "./AppRoutes";
 
-const Routes = () => useRoutes([DashboardRoutes, AuthenticationRoutes]);
+const Routes = () =>
+  useRoutes([
+    StudentDashboardRoutes,
+    TeacherDashboardRoutes,
+    AdminDashboardRoutes,
+    AuthenticationRoutes,
+  ]);
 
 export default Routes;

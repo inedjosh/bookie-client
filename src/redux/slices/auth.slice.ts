@@ -1,44 +1,44 @@
+import { CohortType, TokenType, UserType } from "./../../types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
-
-type User = {
-  id: string;
-  role: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  username: string;
-  profile_url: string;
-};
-
-type Token = {
-  refreshToken: string;
-  accessToken: string;
-};
+import { OTP_TYPE } from "../../constants";
 
 type AuthState = {
-  user: User;
+  user: UserType;
   isAuthenticated: boolean;
-  token: Token;
+  token: TokenType;
+  otpData: { email: string; type: OTP_TYPE };
+  cohort: CohortType | null;
 };
 
 const atk = Cookies.get("atk") as string;
 const rtk = Cookies.get("rtk") as string;
 const initialState: AuthState = {
   user: {
-    id: "",
+    _id: "",
     role: "",
     email: "",
-    first_name: "",
-    last_name: "",
-    username: "",
-    profile_url: "",
+    firstName: "",
+    lastName: "",
+    profileUrl: "",
+    country: "",
+    phoneNumber: "",
+    lastLoginDate: "",
+    accountActive: false,
+    createdAt: "",
+    totalScore: 0,
+    unreadNotifications: 0,
   },
   isAuthenticated: false,
-
+  cohort: null,
   token: {
     refreshToken: rtk,
     accessToken: atk,
+  },
+
+  otpData: {
+    email: "",
+    type: OTP_TYPE.NONE,
   },
 };
 
@@ -46,37 +46,58 @@ const authSlice = createSlice({
   name: "Auth",
   initialState,
   reducers: {
-    signinUser: (state, { payload }: PayloadAction<User>) => {
+    signinUser: (state, { payload }: PayloadAction<UserType>) => {
       state.user = payload;
       state.isAuthenticated = true;
     },
-    logout: (state) => {
+    logoutUser: (state) => {
       state.user = {
-        id: "",
+        _id: "",
         role: "",
         email: "",
-        first_name: "",
-        last_name: "",
-        username: "",
-        profile_url: "",
+        firstName: "",
+        lastName: "",
+        profileUrl: "",
+        country: "",
+        phoneNumber: "",
+        lastLoginDate: "",
+        accountActive: false,
+        createdAt: "",
+        totalScore: 0,
+        unreadNotifications: 0,
       };
       state.isAuthenticated = false;
       state.token = { accessToken: "", refreshToken: "" };
     },
-
+    setCohort: (state, { payload }: PayloadAction<CohortType>) => {
+      state.cohort = payload;
+    },
     setTokens: (
       state,
       { payload }: PayloadAction<{ refreshToken: string; accessToken: string }>
     ) => {
       state.token = payload;
     },
-    setUser: (state, { payload }: PayloadAction<User>) => {
+    setUser: (state, { payload }: PayloadAction<UserType>) => {
       state.user = payload;
+    },
+    setOtpData: (
+      state,
+      { payload }: PayloadAction<{ email: string; type: OTP_TYPE }>
+    ) => {
+      state.otpData = payload;
     },
   },
 });
 
 const { actions, reducer: AuthReducer } = authSlice;
 
-export const { signinUser, setTokens, logout, setUser } = actions;
+export const {
+  signinUser,
+  setTokens,
+  setCohort,
+  logoutUser,
+  setUser,
+  setOtpData,
+} = actions;
 export default AuthReducer;

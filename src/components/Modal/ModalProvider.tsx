@@ -3,6 +3,8 @@ import { createContext, useContext, useState, ReactNode, FC } from "react";
 
 interface ModalState {
   isOpen: boolean;
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   props?: { [key: string]: any }; // Add a props object to store additional data
 }
 
@@ -12,6 +14,8 @@ type ModalStates = {
 
 interface ModalContextType {
   modalStates: ModalStates;
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   showModal: (modalId: string, props?: { [key: string]: any }) => void;
   hideModal: (modalId: string) => void;
 }
@@ -32,6 +36,7 @@ interface ModalProviderProps {
 export const ModalProvider: FC<ModalProviderProps> = ({ children }) => {
   const [modalStates, setModalStates] = useState<ModalStates>({});
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const showModal = (modalId: string, props?: { [key: string]: any }) => {
     setModalStates((prevStates) => ({
       ...prevStates,

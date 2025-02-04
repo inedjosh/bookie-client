@@ -1,4 +1,10 @@
 import { AxiosError } from "axios";
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export const capitalizeFirstLetter = (data: string) => {
   if (!data) return "";
@@ -15,35 +21,79 @@ export const numberFormat = (number: number) => {
   return new Intl.NumberFormat("en-EN").format(number);
 };
 
-export const readableDate = (date: Date): string => {
-  const options: Intl.DateTimeFormatOptions = {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+export const readableDate = (date: Date | string): string => {
+  const parsedDate = typeof date === "string" ? new Date(date) : date;
+
+  // Get individual components
+  const day = parsedDate.getUTCDate();
+  const dayOfWeek = parsedDate.toLocaleDateString("en-US", {
+    weekday: "short", // e.g., "Tue"
+    timeZone: "UTC",
+  });
+  const month = parsedDate.toLocaleDateString("en-US", {
+    month: "short", // e.g., "Sep"
+    timeZone: "UTC",
+  });
+  const year = parsedDate.getUTCFullYear();
+
+  // Get ordinal suffix for the day
+  const ordinalSuffix = (n: number) => {
+    const lastDigit = n % 10;
+    const lastTwoDigits = n % 100;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 13) return "th";
+    switch (lastDigit) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
   };
 
-  const formattedDate = new Date(date).toLocaleDateString("en-US", options);
-  const [month, day, year] = formattedDate.split(" ");
+  const dayWithSuffix = `${day}${ordinalSuffix(day)}`;
 
-  return ` ${month} ${day} ${year}`;
+  // Return the formatted string
+  return `${dayWithSuffix} ${dayOfWeek} ${month} ${year}`;
+};
+
+export const formatDateWithNumbers = (date: Date | string): string => {
+  const parsedDate = typeof date === "string" ? new Date(date) : date;
+
+  // Extract components and pad with leading zeros
+  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+  const year = parsedDate.getFullYear();
+
+  // Return formatted date
+  return `${month}/${day}/${year}`;
+};
+
+export const formatDateForInput = (isoString: string): string => {
+  // Ensure that the input string is treated as UTC
+  const date = new Date(isoString + "T00:00:00Z");
+  return date.toISOString().split("T")[0]; // Returns "2024-12-30"
 };
 
 export const readableDateTime = (
-  date: Date
+  date: Date | string
 ): { date: string; time: string } => {
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-  };
+  const parsedDate = typeof date === "string" ? new Date(date) : date;
 
+  // Reuse the readableDate function for the date part
+  const formattedDate = readableDate(parsedDate);
+
+  // Format the time
   const timeOptions: Intl.DateTimeFormatOptions = {
-    hour: "numeric",
-    minute: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC", // Ensure no timezone offset is applied
   };
-
-  const formattedDate = new Date(date).toLocaleDateString("en-US", dateOptions);
-  const formattedTime = new Date(date).toLocaleTimeString("en-US", timeOptions);
+  const formattedTime = parsedDate.toLocaleTimeString("en-US", timeOptions);
 
   return { date: formattedDate, time: formattedTime };
 };
@@ -110,4 +160,75 @@ export function generateRandomDocumentName() {
   }
 
   return documentName + ".doc";
+}
+
+export function calculateCurrentWeek(userScore: number) {
+  const totalPointsPerWeek = 170;
+  const minimumPointsPerWeek = 85;
+  console.log(userScore);
+  if (userScore < 0) {
+    throw new Error("User score cannot be negative.");
+  }
+
+  if (userScore < minimumPointsPerWeek) {
+    return 1; // If the user hasn't reached the minimum points for Week 1
+  }
+
+  // Calculate the current week
+  const week = Math.ceil(userScore / totalPointsPerWeek) + 1;
+  console.log({ week });
+  return week;
+}
+
+export const getFileType = (file: File): string | null => {
+  const fileTypeMap: { [key: string]: string } = {
+    "application/pdf": "pdf", // For PDF
+    "application/zip": "zip", // For ZIP
+    "text/csv": "csv", // For CSV
+  };
+
+  return fileTypeMap[file.type] || null;
+};
+
+export const formatTimer = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+};
+
+export function formatTimeAgo(date: string | Date): string {
+  const now = new Date();
+  const inputDate = new Date(date);
+
+  const timeDifference = now.getTime() - inputDate.getTime();
+
+  const seconds = Math.floor(timeDifference / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) {
+    return `${seconds} second${seconds === 1 ? "" : "s"} ago`;
+  }
+  if (minutes < 60) {
+    return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  }
+  if (hours < 24) {
+    return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  }
+  if (days === 1) {
+    return `Yesterday, ${new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+    }).format(new Date(date))}`;
+  }
+  if (days < 7) {
+    return `${days} day${days === 1 ? "" : "s"} ago`;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date(date));
 }
